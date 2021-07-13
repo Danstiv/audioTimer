@@ -65,7 +65,7 @@ def md2html(source, dest):
 def mdTool(env):
 	mdAction = env.Action(
 		lambda target, source, env: md2html(source[0].path, target[0].path),
-		lambda target, source, env: 'Generating111 % s' % target[0],
+		lambda target, source, env: 'Generating % s' % target[0],
 	)
 	mdBuilder = env.Builder(
 		action=mdAction,
