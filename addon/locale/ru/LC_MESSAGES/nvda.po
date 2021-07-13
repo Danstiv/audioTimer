@@ -1,0 +1,93 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the audioTimer package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: audioTimer 0.7\n"
+"Report-Msgid-Bugs-To: nvda-translations@groups.io\n"
+"POT-Creation-Date: 2021-07-13 22:10+0700\n"
+"PO-Revision-Date: 2021-07-13 22:18+0700\n"
+"Last-Translator: Danstiv <dan7900@mail.ru>\n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.3\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+msgid "Configure / disable a timer"
+msgstr "Настроить / выключить таймер"
+
+msgid "Timer off."
+msgstr "Таймер выключен."
+
+#, python-brace-format
+msgid "{days} days"
+msgstr "{days} дней"
+
+#, python-brace-format
+msgid "{hours} hours"
+msgstr "{hours} часов"
+
+#, python-brace-format
+msgid "{minutes} minutes"
+msgstr "{minutes} минут"
+
+#, python-brace-format
+msgid "{seconds} seconds"
+msgstr "{seconds} секунд"
+
+msgid " and "
+msgstr " и "
+
+msgid "0 seconds"
+msgstr "0 секунд"
+
+msgid "Get information about timer"
+msgstr "Получить информацию о таймере"
+
+msgid "Timer not started."
+msgstr "Таймер не запущен."
+
+msgid "Get the current second in a minute"
+msgstr "Получить текущую секунду в минуте"
+
+msgid "Timer setting"
+msgstr "Настройка таймера"
+
+msgid "Hours"
+msgstr "Часы"
+
+msgid "Minutes"
+msgstr "Минуты"
+
+msgid "Seconds"
+msgstr "Секунды"
+
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on
+#. to be shown on installation and add-on information found in Add-ons Manager.
+msgid "Audio timer"
+msgstr "Audio timer"
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
+msgid ""
+"Plays a sound at regular intervals.\n"
+"Press nvda+alt+t, enter the desired values ​​in the Hours, Minutes, and "
+"Seconds fields and click OK.\n"
+"Press this combination again to turn off the timer.\n"
+"Press nvda+alt+r to get the remaining time for the next playback.\n"
+"Press nvda+control+f12 to get the current second in a minute."
+msgstr ""
+"Воспроизводит звук через равные промежутки времени.\n"
+"Нажмите nvda + alt + t, введите нужные значения в поля «Часы», «Минуты» и "
+"«Секунды» и нажмите «ОК».\n"
+"Нажмите эту комбинацию еще раз, чтобы выключить таймер.\n"
+"Нажмите nvda + alt + r, чтобы получить оставшееся время до следующего "
+"воспроизведения.\n"
+"Нажмите nvda + control + f12, чтобы получить текущую секунду в минуте."
