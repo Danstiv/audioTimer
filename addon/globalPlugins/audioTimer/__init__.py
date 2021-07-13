@@ -12,6 +12,7 @@ from scriptHandler import script
 addonHandler.initTranslation()
 path_to_sound=os.path.join(os.path.dirname(dialog.__file__), 'sound.wav')
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
+	scriptCategory = 'Audio timer'
 	def __init__(self, *args, **kwargs):
 		globalPluginHandler.GlobalPlugin.__init__(self, *args, **kwargs)
 		self.time=0
