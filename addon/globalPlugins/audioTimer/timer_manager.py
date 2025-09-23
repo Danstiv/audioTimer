@@ -1,8 +1,9 @@
 import threading
 import time
 
-from .config import Config, TimerSchema
 from .enums import TimerState
+from .repository import TimerRepository
+from .schema import TimerSchema
 from .timer import Timer
 
 
@@ -17,9 +18,9 @@ def _with_lock(func):
 class TimerManager:
     TIMER_NAME_TEMPLATE = "Timer {n}"
 
-    def __init__(self, config: Config):
+    def __init__(self, config: TimerRepository):
         self._config = config
-        self.timers = [Timer(config) for config in config.timers]
+        self.timers = [Timer(config) for config in config.get_timers()]
         self._run_thread = None
         self._event = threading.Event()
         self._lock = threading.Lock()
@@ -76,18 +77,14 @@ class TimerManager:
         next_timer.do_next_action()
         if next_timer.should_be_removed:
             self.timers.remove(next_timer)
-            self._config.remove_timer(next_timer.config["id"])
+            self._config.remove_timer(next_timer.config.id)
+        else:
+            self._config.update_timer(next_timer.config)
         self._config.save()
         return 0
 
     @_with_lock
     def add_timer(self, timer: TimerSchema):
-        timer = timer | {
-            "state": TimerState.ACTIVE.value,
-            "finish_time": 0,
-            "repeat_count": 0,
-            "recurrent_notification_time": 0,
-        }
         self._config.add_timer(timer)
         new_timer = Timer(timer)
         new_timer.reset()
@@ -99,7 +96,7 @@ class TimerManager:
     def remove_timer(self, timer_id: int):
         removed = False
         for i, timer in enumerate(self.timers):
-            if timer.config["id"] == timer_id:
+            if timer.config.id == timer_id:
                 del self.timers[i]
                 removed = True
                 break
@@ -111,14 +108,14 @@ class TimerManager:
 
     def get_timer(self, timer_id: int) -> Timer | None:
         for timer in self.timers:
-            if timer.config["id"] == timer_id:
+            if timer.config.id == timer_id:
                 return timer
 
     def trigger_update(self):
         self._event.set()
 
     def generate_timer_name(self):
-        names = set(t.config["name"] for t in self.timers)
+        names = set(t.config.name for t in self.timers)
         n = 1
         while True:
             name = self.TIMER_NAME_TEMPLATE.format(n=n)

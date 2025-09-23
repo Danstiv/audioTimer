@@ -1,22 +1,22 @@
-from enum import IntEnum
+from enum import StrEnum, auto
 
 
-class TimerState(IntEnum):
-    DISABLED = 0
-    ACTIVE = 1
-    PENDING = 2
+class TimerState(StrEnum):
+    DISABLED = auto()
+    ACTIVE = auto()
+    PENDING = auto()
 
 
-class TimerFinishAction(IntEnum):
-    REMOVE = 0
-    DISABLE = 1
+class TimerFinishAction(StrEnum):
+    REMOVE = auto()
+    DISABLE = auto()
 
 
-class NotificationType(IntEnum):
-    ONETIME = 0
-    RECURRENT = 1
+class NotificationType(StrEnum):
+    ONETIME = auto()
+    RECURRENT = auto()
 
 
-class RestartPolicy(IntEnum):
-    IMMEDIATE = 0
-    ON_USER_ACTION = 1
+class RestartPolicy(StrEnum):
+    IMMEDIATE = auto()
+    ON_USER_ACTION = auto()

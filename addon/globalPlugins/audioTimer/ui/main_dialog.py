@@ -57,8 +57,8 @@ class MainDialog(wx.Dialog):
     def refresh_timer_list(self):
         self.timer_list.DeleteAllItems()
         for timer in self.timer_manager.timers:
-            index = self.timer_list.Append([timer.config["name"]])
-            self.timer_list.SetItemData(index, timer.config["id"])
+            index = self.timer_list.Append([timer.config.name])
+            self.timer_list.SetItemData(index, timer.config.id)
         if self.timer_list.GetItemCount() > 0:
             self.timer_list.Focus(0)
             self.timer_list.Select(0)
@@ -79,5 +79,5 @@ class MainDialog(wx.Dialog):
         menu.popup_timer_menu(self.timer_list, position)
 
     def on_add_btn(self, event):
-        new_timer_dialog = NewTimerDialog(self, self.timer_manager)
-        new_timer_dialog.ShowModal()
+        with NewTimerDialog(self, self.timer_manager) as new_timer_dialog:
+            new_timer_dialog.ShowModal()

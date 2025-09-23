@@ -21,7 +21,7 @@ class TimerMenu:
         (self.enable_item if self.timer.enabled else self.disable_item).Enable(False)
 
     def on_remove(self, event):
-        self.timer_manager.remove_timer(self.timer.config["id"])
+        self.timer_manager.remove_timer(self.timer.config.id)
 
     def on_disable(self, event):
         if self.timer.enabled:

@@ -5,13 +5,13 @@ import globalPluginHandler
 import NVDAState
 from scriptHandler import script
 
-from .config import Config
+from .repository import TimerRepository
 from .timer_manager import TimerManager
 from .ui.main_dialog import MainDialog
 
 addonHandler.initTranslation()
 
-CONFIG_PATH = Path(NVDAState.WritePaths.configDir) / "audioTimer.ini"
+CONFIG_PATH = Path(NVDAState.WritePaths.configDir) / "audioTimer.json"
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
@@ -19,7 +19,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def __init__(self):
         super().__init__()
-        self.config = Config(CONFIG_PATH)
+        self.config = TimerRepository(CONFIG_PATH)
         self.timer_manager = TimerManager(self.config)
         self.timer_manager.start()
 

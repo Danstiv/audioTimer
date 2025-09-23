@@ -4,6 +4,7 @@ import wx
 from gui.guiHelper import BoxSizerHelper
 
 from ..enums import NotificationType, RestartPolicy, TimerFinishAction
+from ..schema import TimerSchema
 from ..timer_manager import TimerManager
 
 MINUTE = 60
@@ -31,9 +32,9 @@ class NewTimerDialog(wx.Dialog):
         self.notification_type_choice = self.main_sizer.addLabeledControl(
             _("Notify"), wx.Choice
         )
-        self.notification_type_choice.Append(_("Once"), NotificationType.ONETIME.value)
+        self.notification_type_choice.Append(_("Once"), NotificationType.ONETIME)
         self.notification_type_choice.Append(
-            _("Recurrently"), NotificationType.RECURRENT.value
+            _("Recurrently"), NotificationType.RECURRENT
         )
         self.notification_type_choice.SetSelection(0)
         self.notification_type_choice.Bind(
@@ -45,12 +46,8 @@ class NewTimerDialog(wx.Dialog):
         self.restart_policy_choice = self.main_sizer.addLabeledControl(
             _("Restart"), wx.Choice
         )
-        self.restart_policy_choice.Append(
-            _("Immediately"), RestartPolicy.IMMEDIATE.value
-        )
-        self.restart_policy_choice.Append(
-            _("Manually"), RestartPolicy.ON_USER_ACTION.value
-        )
+        self.restart_policy_choice.Append(_("Immediately"), RestartPolicy.IMMEDIATE)
+        self.restart_policy_choice.Append(_("Manually"), RestartPolicy.ON_USER_ACTION)
         self.restart_policy_choice.SetSelection(0)
         self.remove_after_last_repeat_cb = self.main_sizer.addLabeledControl(
             _("Remove after last repeat"), wx.CheckBox
@@ -74,7 +71,7 @@ class NewTimerDialog(wx.Dialog):
         )
         (
             self.recurrent_notification_interval_field.Hide()
-            if notification_type != NotificationType.RECURRENT
+            if notification_type is not NotificationType.RECURRENT
             else self.recurrent_notification_interval_field.Show()
         )
 
@@ -94,7 +91,7 @@ class NewTimerDialog(wx.Dialog):
             TimerFinishAction.REMOVE
             if self.remove_after_last_repeat_cb.GetValue()
             else TimerFinishAction.RESTART
-        ).value
+        )
         notification_type = self.notification_type_choice.GetClientData(
             self.notification_type_choice.GetSelection()
         )
@@ -106,16 +103,14 @@ class NewTimerDialog(wx.Dialog):
         restart_policy = self.restart_policy_choice.GetClientData(
             self.restart_policy_choice.GetSelection()
         )
-        new_timer = {
-            "id": None,
-            "name": self.timer_manager.generate_timer_name(),
-            "interval": interval,
-            "repeat_limit": self.repeat_limit_field.GetValue(),
-            "finish_action": finish_action,
-            "notification_type": notification_type,
-            "recurrent_notification_interval": recurrent_notification_interval,
-            "restart_policy": restart_policy,
-            "notification_sound": "",
-        }
+        new_timer = TimerSchema(
+            name=self.timer_manager.generate_timer_name(),
+            interval=interval,
+            repeat_limit=self.repeat_limit_field.GetValue(),
+            finish_action=finish_action,
+            notification_type=notification_type,
+            recurrent_notification_interval=recurrent_notification_interval,
+            restart_policy=restart_policy,
+        )
         self.timer_manager.add_timer(new_timer)
         event.Skip()
