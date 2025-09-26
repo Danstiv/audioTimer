@@ -1,7 +1,8 @@
 import threading
 import time
 
-from .enums import TimerState
+from logHandler import log
+
 from .repository import TimerRepository
 from .schema import TimerSchema
 from .timer import Timer
@@ -25,6 +26,7 @@ class TimerManager:
         self._event = threading.Event()
         self._lock = threading.Lock()
         self._terminate = False
+        self._update_callbacks = set()
 
     def start(self):
         if self._run_thread is not None:
@@ -81,6 +83,7 @@ class TimerManager:
         else:
             self._config.update_timer(next_timer.config)
         self._config.save()
+        self.trigger_update()
         return 0
 
     @_with_lock
@@ -112,7 +115,21 @@ class TimerManager:
                 return timer
 
     def trigger_update(self):
+        self._run_update_callbacks()
         self._event.set()
+
+    def register_update_callback(self, callback: callable):
+        self._update_callbacks.add(callback)
+
+    def unregister_update_callback(self, callback: callable):
+        self._update_callbacks.discard(callback)
+
+    def _run_update_callbacks(self):
+        for callback in self._update_callbacks:
+            try:
+                callback()
+            except Exception:
+                log.exception("Exception in update callback:")
 
     def generate_timer_name(self):
         names = set(t.config.name for t in self.timers)

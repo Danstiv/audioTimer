@@ -2,6 +2,7 @@ import gui
 import wx
 from gui.guiHelper import BoxSizerHelper
 
+from ..timer import Timer
 from ..timer_manager import TimerManager
 from .new_timer_dialog import NewTimerDialog
 from .timer_menu import TimerMenu
@@ -33,7 +34,8 @@ class MainDialog(wx.Dialog):
         self.SetSizer(self.main_sizer.sizer)
         self.SetEscapeId(wx.ID_CLOSE)
         self.Bind(wx.EVT_CLOSE, self.on_close)
-        self.refresh_timer_list()
+        self.refresh_timer_list(True)
+        self.timer_manager.register_update_callback(self.on_timers_update)
 
     @classmethod
     def show_main_dialog(cls, timer_manager):
@@ -52,16 +54,72 @@ class MainDialog(wx.Dialog):
 
     def on_close(self, event):
         self._clear_main_dialog()
+        self.timer_manager.unregister_update_callback(self.on_timers_update)
         self.Destroy()
 
-    def refresh_timer_list(self):
-        self.timer_list.DeleteAllItems()
-        for timer in self.timer_manager.timers:
-            index = self.timer_list.Append([timer.config.name])
-            self.timer_list.SetItemData(index, timer.config.id)
-        if self.timer_list.GetItemCount() > 0:
+    def on_timers_update(self):
+        # TODO: Ensure thread safety here!
+        self.refresh_timer_list()
+
+    def _get_timer_string(self, timer: Timer):
+        return timer.config.name
+
+    def refresh_timer_list(self, select_first=False):
+        selected_index = self.timer_list.GetFirstSelected()
+        selected_timer_id = None
+        if selected_index > -1:
+            selected_timer_id = self.timer_list.GetItemData(selected_index)
+        current_timers: dict[int, int] = {}
+        for i in range(self.timer_list.GetItemCount()):
+            timer_id = self.timer_list.GetItemData(i)
+            current_timers[timer_id] = i
+        manager_timers: dict[int, tuple[int, Timer]] = {
+            timer.config.id: (i, timer)
+            for i, timer in enumerate(self.timer_manager.timers)
+        }
+        # Delete timers that no longer exist in the manager.
+        # Indexes in the current_timers are ordered in ascending order,
+        # So simply reverse and pop from highest to lowest.
+        for timer_id, i in list(current_timers.items())[::-1]:
+            if timer_id not in manager_timers:
+                self.timer_list.DeleteItem(i)
+                current_timers.pop(timer_id)
+        # Now timer list in the ui is a subset of manager_timers.
+        for timer_id, (manager_timer_index, timer) in manager_timers.items():
+            ui_index = current_timers.get(timer_id, None)
+            if ui_index is None:
+                # New timer
+                self.timer_list.InsertItem(
+                    manager_timer_index, self._get_timer_string(timer)
+                )
+                self.timer_list.SetItemData(manager_timer_index, timer_id)
+            else:
+                # Existing timer, set new text for it in any case,
+                # and update actual id if order is changed.
+                self.timer_list.SetItemText(
+                    manager_timer_index, self._get_timer_string(timer)
+                )
+                if manager_timer_index != ui_index:
+                    self.timer_list.SetItemData(manager_timer_index, timer_id)
+            current_timers[timer_id] = manager_timer_index
+        if select_first:
             self.timer_list.Focus(0)
             self.timer_list.Select(0)
+            return
+        if selected_index < 0:
+            # Nothing was selected before, no need to reselect.
+            return
+        if selected_timer_id not in current_timers:
+            # Previously selected timer was removed, so select the nearest.
+            # It seems that Select not raises exception,
+            # so potential -1 is not a problem.
+            new_selection_index = min(
+                selected_index, self.timer_list.GetItemCount() - 1
+            )
+        else:
+            new_selection_index = current_timers[selected_timer_id]
+        self.timer_list.Select(new_selection_index)
+        self.timer_list.Focus(new_selection_index)
 
     def on_context_menu(self, event):
         first_selected_index = self.timer_list.GetFirstSelected()
