@@ -58,8 +58,10 @@ class MainDialog(wx.Dialog):
         self.Destroy()
 
     def on_timers_update(self):
-        # TODO: Ensure thread safety here!
-        self.refresh_timer_list()
+        if wx.IsMainThread():
+            self.refresh_timer_list()
+        else:
+            wx.CallAfter(self.refresh_timer_list)
 
     def _get_timer_string(self, timer: Timer):
         return timer.config.name
