@@ -60,31 +60,40 @@ class TimerManager:
     def _update(self) -> int | None:
         next_timer = None
         next_timer_action_timestamp = None
-        for timer in self.enabled_timers:
-            if (
+        delay = None
+        changed = False
+        i = 0
+        while i < len(self.timers):
+            timer = self.timers[i]
+            if timer.should_be_removed:
+                del self.timers[i]
+                self._config.remove_timer(timer.config.id)
+                changed = True
+                continue
+            if timer.enabled and (
                 next_timer is None
                 or timer.next_action_time < next_timer_action_timestamp
             ):
                 next_timer = timer
                 next_timer_action_timestamp = next_timer.next_action_time
-        if next_timer is None:
-            return
-        timestamp = time.time()
-        delay = next_timer_action_timestamp - timestamp
-        if delay is None:
-            return
-        if delay > 0:
-            delay = min(delay, 30)
-            return delay
-        next_timer.do_next_action()
-        if next_timer.should_be_removed:
-            self.timers.remove(next_timer)
-            self._config.remove_timer(next_timer.config.id)
-        else:
-            self._config.update_timer(next_timer.config)
-        self._config.save()
-        self.trigger_update()
-        return 0
+            i += 1
+        if next_timer is not None:
+            timestamp = time.time()
+            delay = next_timer_action_timestamp - timestamp
+            if delay > 0:
+                delay = min(delay, 30)
+            else:
+                next_timer.do_next_action()
+                if next_timer.should_be_removed:
+                    self.timers.remove(next_timer)
+                    self._config.remove_timer(next_timer.config.id)
+                else:
+                    self._config.update_timer(next_timer.config)
+                changed = True
+        if changed:
+            self._config.save()
+            self.trigger_update()
+        return delay
 
     @_with_lock
     def add_timer(self, timer: TimerSchema):
