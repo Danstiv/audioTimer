@@ -102,6 +102,8 @@ class MainDialog(wx.Dialog):
                 if manager_timer_index != ui_index:
                     self.timer_list.SetItemData(manager_timer_index, timer_id)
             current_timers[timer_id] = manager_timer_index
+        # It seems that Select and Focus not raises exception,
+        # so potential out of bounds is not a problem.
         if select_first:
             self.timer_list.Focus(0)
             self.timer_list.Select(0)
@@ -111,8 +113,6 @@ class MainDialog(wx.Dialog):
             return
         if selected_timer_id not in current_timers:
             # Previously selected timer was removed, so select the nearest.
-            # It seems that Select not raises exception,
-            # so potential -1 is not a problem.
             new_selection_index = min(
                 selected_index, self.timer_list.GetItemCount() - 1
             )
