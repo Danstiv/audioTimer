@@ -40,14 +40,17 @@ class Timer:
             raise ValueError("Timer is disabled")
 
     @property
-    def next_action_time(self) -> int:
-        self.check_enabled()
+    def next_action_time(self) -> int | None:
+        if not self.enabled:
+            return
         if self.config.state is TimerState.PENDING:
-            return self.config.recurrent_notification_time
-        elif self.config.state is TimerState.ACTIVE:
-            if not self.recurrent_notification_active:
-                return self.config.finish_time
-            return min(self.config.finish_time, self.config.recurrent_notification_time)
+            if self.recurrent_notification_active:
+                return self.config.recurrent_notification_time
+            return
+        # active
+        if not self.recurrent_notification_active:
+            return self.config.finish_time
+        return min(self.config.finish_time, self.config.recurrent_notification_time)
 
     def do_next_action(self):
         self.check_enabled()

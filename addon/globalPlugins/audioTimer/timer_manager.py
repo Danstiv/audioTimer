@@ -70,12 +70,12 @@ class TimerManager:
                 self._config.remove_timer(timer.config.id)
                 changed = True
                 continue
-            if timer.enabled and (
-                next_timer is None
-                or timer.next_action_time < next_timer_action_timestamp
+            action_timestamp = timer.next_action_time
+            if action_timestamp is not None and (
+                next_timer is None or action_timestamp < next_timer_action_timestamp
             ):
                 next_timer = timer
-                next_timer_action_timestamp = next_timer.next_action_time
+                next_timer_action_timestamp = action_timestamp
             i += 1
         if next_timer is not None:
             timestamp = time.time()
