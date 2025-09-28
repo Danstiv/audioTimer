@@ -1,7 +1,10 @@
+import time
+
 import gui
 import wx
 from gui.guiHelper import BoxSizerHelper
 
+from ..enums import RestartPolicy, TimerState
 from ..timer import Timer
 from ..timer_manager import TimerManager
 from .new_timer_dialog import NewTimerDialog
@@ -63,8 +66,42 @@ class MainDialog(wx.Dialog):
         else:
             wx.CallAfter(self.refresh_timer_list)
 
-    def _get_timer_string(self, timer: Timer):
-        return timer.config.name
+    def _get_timer_label(self, timer: Timer):
+        # TODO: add comments for translators.
+        components = [timer.config.name]
+        if not timer.enabled:
+            components.append(_("disabled"))
+            return ", ".join(components)
+        repeat_limit_component = None
+        if timer.config.repeat_limit > 0:
+            repeat_limit_component = (
+                f"({timer.config.repeat_count} / {timer.config.repeat_limit})"
+            )
+        if timer.config.state is TimerState.ACTIVE:
+            # TODO: Implement time formatting.
+            delay = int(timer.config.finish_time - time.time())
+            active_components = [
+                _("{delay} seconds left").format(delay=delay),
+                *([] if repeat_limit_component is None else [repeat_limit_component]),
+            ]
+            components.append(" ".join(active_components))
+        else:  # Pending
+            if (
+                timer.config.restart_policy is RestartPolicy.ON_USER_ACTION
+                and not timer.repeat_limit_reached
+            ):
+                pending_components = [
+                    _("pending"),
+                    *(
+                        []
+                        if repeat_limit_component is None
+                        else [repeat_limit_component]
+                    ),
+                ]
+                components.append(" ".join(pending_components))
+        if timer.recurrent_notification_active:
+            components.append(_("notifying recurrently"))
+        return ", ".join(components)
 
     def refresh_timer_list(self, select_first=False):
         selected_index = self.timer_list.GetFirstSelected()
@@ -92,14 +129,14 @@ class MainDialog(wx.Dialog):
             if ui_index is None:
                 # New timer
                 self.timer_list.InsertItem(
-                    manager_timer_index, self._get_timer_string(timer)
+                    manager_timer_index, self._get_timer_label(timer)
                 )
                 self.timer_list.SetItemData(manager_timer_index, timer_id)
             else:
                 # Existing timer, set new text for it in any case,
                 # and update actual id if order is changed.
                 self.timer_list.SetItemText(
-                    manager_timer_index, self._get_timer_string(timer)
+                    manager_timer_index, self._get_timer_label(timer)
                 )
                 if manager_timer_index != ui_index:
                     self.timer_list.SetItemData(manager_timer_index, timer_id)
