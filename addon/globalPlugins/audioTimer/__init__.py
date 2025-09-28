@@ -26,6 +26,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def terminate(self):
         self.timer_manager.stop()
 
-    @script(description=_(""), gesture="kb:nvda+shift+a")
+    @script(description=_("Open main window"))
     def script_show_dialog(self, gesture):
         MainDialog.show_main_dialog(self.timer_manager)
