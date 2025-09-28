@@ -104,6 +104,7 @@ class MainDialog(wx.Dialog):
         return ", ".join(components)
 
     def refresh_timer_list(self, select_first=False):
+        initial_item_count = self.timer_list.GetItemCount()
         selected_index = self.timer_list.GetFirstSelected()
         selected_timer_id = None
         if selected_index > -1:
@@ -143,7 +144,9 @@ class MainDialog(wx.Dialog):
             current_timers[timer_id] = manager_timer_index
         # It seems that Select and Focus not raises exception,
         # so potential out of bounds is not a problem.
-        if select_first:
+        if select_first or (
+            initial_item_count == 0 and self.timer_list.GetItemCount() > 0
+        ):
             self.timer_list.Focus(0)
             self.timer_list.Select(0)
             return
