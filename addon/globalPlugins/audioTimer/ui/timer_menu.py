@@ -21,18 +21,21 @@ class TimerMenu:
         self.menu.Append(item)
         return item
 
+    def _update_timer(self):
+        self.timer_manager.update_timer(self.timer)
+
     def on_remove(self, event):
         self.timer_manager.remove_timer(self.timer.config.id)
 
     def on_disable(self, event):
         if self.timer.enabled:
             self.timer.disable()
-            self.timer_manager.trigger_update()
+            self._update_timer()
 
     def on_enable(self, event):
         if not self.timer.enabled:
             self.timer.enable()
-            self.timer_manager.trigger_update()
+            self._update_timer()
 
     def popup_timer_menu(self, parent, position):
         parent.PopupMenu(self.menu, pos=position)

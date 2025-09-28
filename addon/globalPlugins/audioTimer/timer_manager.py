@@ -92,7 +92,7 @@ class TimerManager:
                 changed = True
         if changed:
             self._config.save()
-            self.trigger_update()
+            self._trigger_update()
         return delay
 
     @_with_lock
@@ -102,7 +102,7 @@ class TimerManager:
         self._config.add_timer(timer)
         self.timers.append(new_timer)
         self._config.save()
-        self.trigger_update()
+        self._trigger_update()
 
     @_with_lock
     def remove_timer(self, timer_id: int):
@@ -116,14 +116,18 @@ class TimerManager:
             raise ValueError(f"Timer with id {timer_id} not found")
         self._config.remove_timer(timer_id)
         self._config.save()
-        self.trigger_update()
+        self._trigger_update()
 
     def get_timer(self, timer_id: int) -> Timer | None:
         for timer in self.timers:
             if timer.config.id == timer_id:
                 return timer
 
-    def trigger_update(self):
+    def update_timer(self, timer: Timer):
+        self._config.update_timer(timer.config)
+        self._trigger_update()
+
+    def _trigger_update(self):
         self._run_update_callbacks()
         self._config.save()
         self._event.set()
