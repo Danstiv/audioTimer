@@ -86,7 +86,7 @@ class Timer:
             raise ValueError("Timer is already enabled")
         self.reset()
 
-    def dismiss_recurrent_notification(self):
+    def stop_recurrent_notification(self):
         if not self.recurrent_notification_active:
             raise ValueError("Recurrent notification is not active")
         self.config.recurrent_notification_time = 0
@@ -97,7 +97,7 @@ class Timer:
         if not self.waiting_for_user_action:
             raise ValueError("Invalid transition requested")
         if self.recurrent_notification_active:
-            self.dismiss_recurrent_notification()
+            self.stop_recurrent_notification()
         self._reset_round()
 
     def _finish(self, timestamp):

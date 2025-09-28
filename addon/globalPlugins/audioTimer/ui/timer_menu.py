@@ -15,9 +15,9 @@ class TimerMenu:
                     _("Start next round"), self.on_start_next_round
                 )
             if self.timer.recurrent_notification_active:
-                self.dismiss_recurrent_notification_item = self._add_menu_item(
-                    _("Dismiss recurrent notification"),
-                    self.on_dismiss_recurrent_notification,
+                self.stop_recurrent_notification_item = self._add_menu_item(
+                    _("Stop recurrent notification"),
+                    self.on_stop_recurrent_notification,
                 )
             self.disable_item = self._add_menu_item(_("Disable"), self.on_disable)
         else:
@@ -46,9 +46,9 @@ class TimerMenu:
             self.timer.enable()
             self._update_timer()
 
-    def on_dismiss_recurrent_notification(self, event):
+    def on_stop_recurrent_notification(self, event):
         if self.timer.recurrent_notification_active:
-            self.timer.dismiss_recurrent_notification()
+            self.timer.stop_recurrent_notification()
             self._update_timer()
 
     def on_start_next_round(self, event):
