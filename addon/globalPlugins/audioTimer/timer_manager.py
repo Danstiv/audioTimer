@@ -44,7 +44,7 @@ class TimerManager:
         self._run_thread = None
 
     @property
-    def enabled_timers(self):
+    def enabled_timers(self) -> list[Timer]:
         return [t for t in self.timers if t.enabled]
 
     def _run(self):
