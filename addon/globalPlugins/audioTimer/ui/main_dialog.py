@@ -7,6 +7,7 @@ from gui.guiHelper import BoxSizerHelper
 from ..enums import RestartPolicy, TimerState
 from ..timer import Timer
 from ..timer_manager import TimerManager
+from ..utils import format_time
 from .new_timer_dialog import NewTimerDialog
 from .timer_menu import TimerMenu
 
@@ -78,10 +79,9 @@ class MainDialog(wx.Dialog):
                 f"({timer.config.repeat_count} / {timer.config.repeat_limit})"
             )
         if timer.config.state is TimerState.ACTIVE:
-            # TODO: Implement time formatting.
-            delay = int(timer.config.finish_time - time.time())
+            time_left = format_time(int(timer.config.finish_time - time.time()))
             active_components = [
-                _("{delay} seconds left").format(delay=delay),
+                _("{time_left} left").format(time_left=time_left),
                 *([] if repeat_limit_component is None else [repeat_limit_component]),
             ]
             components.append(" ".join(active_components))
