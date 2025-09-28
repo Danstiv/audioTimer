@@ -96,6 +96,8 @@ class Timer:
     def start_next_round(self):
         if not self.waiting_for_user_action:
             raise ValueError("Invalid transition requested")
+        if self.recurrent_notification_active:
+            self.dismiss_recurrent_notification()
         self._reset_round()
 
     def _finish(self, timestamp):
