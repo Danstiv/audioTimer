@@ -90,7 +90,7 @@ class NewTimerDialog(wx.Dialog):
         finish_action = (
             TimerFinishAction.REMOVE
             if self.remove_after_last_repeat_cb.GetValue()
-            else TimerFinishAction.RESTART
+            else TimerFinishAction.DISABLE
         )
         notification_type = self.notification_type_choice.GetClientData(
             self.notification_type_choice.GetSelection()

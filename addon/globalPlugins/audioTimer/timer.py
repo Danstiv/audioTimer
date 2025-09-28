@@ -90,6 +90,8 @@ class Timer:
         if not self.recurrent_notification_active:
             raise ValueError("Recurrent notification is not active")
         self.config.recurrent_notification_time = 0
+        if self.repeat_limit_reached:
+            self.disable()
 
     def start_next_round(self):
         if not self.waiting_for_user_action:
