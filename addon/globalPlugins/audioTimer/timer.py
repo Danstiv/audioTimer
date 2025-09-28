@@ -35,6 +35,14 @@ class Timer:
     def recurrent_notification_active(self):
         return self.config.recurrent_notification_time > 0
 
+    @property
+    def waiting_for_user_action(self):
+        return (
+            self.config.restart_policy is RestartPolicy.ON_USER_ACTION
+            and self.config.state is TimerState.PENDING
+            and not self.repeat_limit_reached
+        )
+
     def check_enabled(self):
         if not self.enabled:
             raise ValueError("Timer is disabled")
@@ -59,10 +67,13 @@ class Timer:
         self._notify_recurrent(timestamp)
 
     def reset(self):
-        timestamp = time.time()
-        self.config.finish_time = timestamp + self.config.interval
         self.config.repeat_count = 0
         self.config.recurrent_notification_time = 0
+        self._reset_round()
+
+    def _reset_round(self):
+        timestamp = time.time()
+        self.config.finish_time = timestamp + self.config.interval
         self.config.state = TimerState.ACTIVE
 
     def disable(self):
@@ -74,6 +85,16 @@ class Timer:
         if self.enabled:
             raise ValueError("Timer is already enabled")
         self.reset()
+
+    def dismiss_recurrent_notification(self):
+        if not self.recurrent_notification_active:
+            raise ValueError("Recurrent notification is not active")
+        self.config.recurrent_notification_time = 0
+
+    def start_next_round(self):
+        if not self.waiting_for_user_action:
+            raise ValueError("Invalid transition requested")
+        self._reset_round()
 
     def _finish(self, timestamp):
         if not (
