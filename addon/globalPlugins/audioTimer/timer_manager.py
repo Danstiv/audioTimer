@@ -97,9 +97,9 @@ class TimerManager:
 
     @_with_lock
     def add_timer(self, timer: TimerSchema):
-        self._config.add_timer(timer)
         new_timer = Timer(timer)
         new_timer.reset()
+        self._config.add_timer(timer)
         self.timers.append(new_timer)
         self._config.save()
         self.trigger_update()
