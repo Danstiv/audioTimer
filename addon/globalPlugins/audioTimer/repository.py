@@ -18,8 +18,8 @@ class TimerRepository:
             self._config = deepcopy(INITIAL_CONFIG)
 
     def save(self):
-        with self._config_path.open("wb") as f:
-            f.write(json.dumps(self._config, indent=2, ensure_ascii=False).encode())
+        data = json.dumps(self._config, indent=2, ensure_ascii=False).encode()
+        self._config_path.write_bytes(data)
 
     def get_timers(self):
         return [TimerSchema(**t) for t in self._config["timers"]]

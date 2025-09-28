@@ -125,6 +125,7 @@ class TimerManager:
 
     def trigger_update(self):
         self._run_update_callbacks()
+        self._config.save()
         self._event.set()
 
     def register_update_callback(self, callback: callable):
